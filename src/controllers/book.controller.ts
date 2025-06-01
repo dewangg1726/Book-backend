@@ -3,8 +3,21 @@ import Book from '../models/book.model';
 
 export const getBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const books = await Book.find({ userId: req.user!.userId }).sort({ createdAt: -1 });
-    res.json(books);
+
+    const rawLimit = req.query.limit;
+    const rawOffset = req.query.offset;
+
+    const limitStr = typeof rawLimit === 'string'?rawLimit:'';
+    const offSetStr = typeof rawOffset === 'string'?rawOffset:'';
+
+    const limitNum = parseInt(limitStr);
+    const offsetNum = parseInt(offSetStr);
+    const filter = {userId:req.user!.userId};
+
+    const [total,books] = await Promise.all([Book.countDocuments(filter),
+    Book.find(filter).sort({ createdAt: -1 }).skip(offsetNum).limit(limitNum)])
+    ;
+    res.json({books,total});
   } catch (err) { next(err); }
 };
 
@@ -33,3 +46,4 @@ export const deleteBook = async (req: Request, res: Response, next: NextFunction
     res.sendStatus(204);
   } catch (err) { next(err); }
 };
+

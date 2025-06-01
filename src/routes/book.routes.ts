@@ -5,7 +5,7 @@ import { getBooks, createBook, updateBook, deleteBook } from '../controllers/boo
 const router = Router();
 
 router.use(authenticate);      // protect everything below
-router.get('/', getBooks);
+router.get('/fetch', getBooks);
 router.post('/', createBook);
 router.put('/:id', updateBook);
 router.delete('/:id', deleteBook);
